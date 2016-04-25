@@ -90,9 +90,9 @@ development:
 test:
   sessions:
     default:
-      database: mongo_data_store_test
+      database: <%= ENV['MONGO_NAME'] %>
       hosts:
-        - localhost:27017
+        - localhost:<%= ENV['MONGO_PORT'] %>
       options:
         read: primary
         # In the test environment we lower the retries and retry interval to
