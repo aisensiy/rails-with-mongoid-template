@@ -20,7 +20,7 @@ gem 'unicorn'
 
 gem 'factory_girl_rails'
 
-gem 'rails_12factor'
+gem 'rails_12factor', group: :production
 
 gem 'responders'
 gem 'mongoid-enum'
