@@ -104,7 +104,7 @@ test:
 production:
   sessions:
     default:
-      database: mongo_data_store_production
+      database: <%= ENV['MONGO_NAME'] %>
       hosts:
         - localhost:<%= ENV['MONGO_PORT'] %>
       options:
