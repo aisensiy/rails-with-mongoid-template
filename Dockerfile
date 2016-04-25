@@ -23,11 +23,11 @@ RUN gem install bundler \
 
 RUN apk --update add --virtual build-dependencies build-base ruby-dev openssl-dev \
     libxml2-dev libxslt-dev \
-    postgresql-dev libc-dev linux-headers && cd /app
+    libc-dev linux-headers
 
 RUN gem install -N nokogiri -- --use-system-libraries
     # cleanup and settings
-    bundle config --global build.nokogiri  "--use-system-libraries" && \
+RUN bundle config --global build.nokogiri  "--use-system-libraries" && \
     bundle config --global build.nokogumbo "--use-system-libraries" && \
     find / -type f -iname \*.apk-new -delete && \
     rm -rf /var/cache/apk/* && \
@@ -36,4 +36,3 @@ RUN gem install -N nokogiri -- --use-system-libraries
 
 ADD build.sh build.sh
 RUN chmod a+x build.sh
-

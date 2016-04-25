@@ -52,15 +52,15 @@ trap on_exit HUP INT TERM QUIT ABRT EXIT
 CODEBASE_DIR=$CODEBASE
 HOST_IP=$(ip route|awk '/default/ { print $3 }')
 
-export MONGO_USERNAME=mysql
-export MONGO_PASSWORD=mysql
+export MONGO_USERNAME=admin
+export MONGO_PASSWORD=mongo
 export MONGO_NAME=testdb
 
 echo
 puts_step "Launching baking services ..."
-MONGO_CONTAINER=$(docker run -d -P -e -e MONGO_PASS=$DB_PASSWORD tutum/mongo)
+MONGO_CONTAINER=$(docker run -d -P -e MONGODB_PASS=$MONGO_PASSWORD -e MONGODB_USER=$MONGO_USERNAME -e MONGODB_DATABASE=$MONGO_NAME tutum/mongodb)
 MONGO_PORT=$(docker inspect -f '{{(index (index .NetworkSettings.Ports "27017/tcp") 0).HostPort}}' ${MONGO_CONTAINER})
-until docker exec $MONGO_CONTAINER mongo --host $MONGO_CONTAINER --port $MONGO_PORT -u admin -p $MONG_PASSWORD --eval "ls()" &>/dev/null ; do
+until docker exec $MONGO_CONTAINER mongo $MONGO_NAME --host 127.0.0.1 --port 27017 -u $MONGO_USERNAME -p $MONGO_PASSWORD --eval "ls()" &>/dev/null ; do
     echo "...."
     sleep 1
 done
@@ -75,6 +75,14 @@ cd $CODEBASE_DIR
 
 echo
 puts_step "Install dependencies ..."
+gem install -N nokogiri -- --use-system-libraries
+# cleanup and settings
+bundle config --global build.nokogiri  "--use-system-libraries" && \
+bundle config --global build.nokogumbo "--use-system-libraries" && \
+  find / -type f -iname \*.apk-new -delete && \
+  rm -rf /var/cache/apk/* && \
+  rm -rf /usr/lib/lib/ruby/gems/*/cache/* && \
+  rm -rf ~/.gem
 bundle install --without development production
 echo
 
@@ -96,32 +104,22 @@ RUN gem install bundler \
     && rm -r /root/.gem \
     && find / -name '*.gem' | xargs rm
 
-ADD Gemfile /app/
-ADD Gemfile.lock /app/
-
 RUN apk --update add --virtual build-dependencies build-base ruby-dev openssl-dev \
     libxml2-dev libxslt-dev \
-    postgresql-dev libc-dev linux-headers && cd /app
+    libc-dev linux-headers
 
-RUN gem install -N nokogiri -- --use-system-libraries && \
-    gem install -N rails --version "$RAILS_VERSION" && \
-    echo 'gem: --no-document' >> ~/.gemrc && \
-    cp ~/.gemrc /etc/gemrc && \
-    chmod uog+r /etc/gemrc && \
-
+RUN gem install -N nokogiri -- --use-system-libraries
     # cleanup and settings
-    bundle config --global build.nokogiri  "--use-system-libraries" && \
+RUN bundle config --global build.nokogiri  "--use-system-libraries" && \
     bundle config --global build.nokogumbo "--use-system-libraries" && \
     find / -type f -iname \*.apk-new -delete && \
     rm -rf /var/cache/apk/* && \
     rm -rf /usr/lib/lib/ruby/gems/*/cache/* && \
     rm -rf ~/.gem
 
-RUN cd /app && bundle install --without development test
-
 ADD . /app
-RUN chown -R nobody:nogroup /app
-USER nobody
+
+RUN cd /app && bundle install --without development test
 
 ENV RAILS_ENV production
 WORKDIR /app
