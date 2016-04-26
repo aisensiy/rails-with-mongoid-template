@@ -35,6 +35,8 @@ end
 group :test do
   gem 'airborne'
   gem 'database_cleaner', '~> 1.5.1'
+  gem 'httpclient'
+  gem 'rest-client'
 end
 
 group :development do

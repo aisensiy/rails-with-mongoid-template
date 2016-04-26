@@ -17,6 +17,8 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require 'airborne'
+require 'json'
+require 'rest_client'
 
 Airborne.configure do |config|
   config.base_url = ENV['ENDPOINT'] || ''
@@ -47,7 +49,15 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
-    print 'wahhhhh'
+    if File.file?('../manifest.json')
+      print 'login...'
+      meta = JSON.parse(File.read('../manifest.json'))
+      response = RestClient.post "#{meta['entry_point']}/authentication", { user_name: 'admin' }, {:content_type => :json}
+      cookie = response.headers[:set_cookie]
+
+      print 'post result...'
+      RestClient.put meta['evaluation_uri'], { status: "FAILED", time: Time.now.to_i - meta['first_commit'] / 1000 }, {:content_type => :json, :cookie => cookie}
+    end
   end
 
   # rspec-mocks config goes here. You can use an alternate test double
