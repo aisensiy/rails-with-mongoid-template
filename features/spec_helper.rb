@@ -20,7 +20,7 @@ require 'database_cleaner'
 require 'airborne'
 
 Airborne.configure do |config|
-  config.base_url = 'http://localhost:3000'
+  config.base_url = ENV['ENDPOINT'] || ''
 end
 
 RSpec.configure do |config|
