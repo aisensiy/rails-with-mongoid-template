@@ -86,7 +86,9 @@ development:
 test:
   sessions:
     default:
-      uri: "mongodb://<%= ENV['MONGO_USERNAME'] || 'test' %>:<%= ENV['MONGO_PASSWORD'] || '' %>@<%= ENV['MONGO_HOST'] || 'localhost' %>:<%= ENV['MONGO_PORT'] || 27017 %>/<%= ENV['MONGO_NAME'] || 'testdb' %>"
+      database: testdb
+      hosts:
+        - localhost:27017
       options:
         read: primary
         # In the test environment we lower the retries and retry interval to

@@ -33,8 +33,7 @@ group :development, :test do
 end
 
 group :test do
-  gem 'cucumber-rails', :require => false
-  gem 'cucumber-api-steps', :require => false
+  gem 'airborne'
   gem 'database_cleaner', '~> 1.5.1'
 end
 
