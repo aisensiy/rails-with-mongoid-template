@@ -49,15 +49,6 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
-    if File.file?('../manifest.json')
-      print 'login...'
-      meta = JSON.parse(File.read('../manifest.json'))
-      response = RestClient.post "#{meta['entry_point']}/authentication", { user_name: 'admin' }.to_json, {:content_type => :json}
-      cookie = response.headers[:set_cookie]
-
-      print 'post result...'
-      RestClient.put meta['evaluation_uri'], { status: "FAILED", time: Time.now.to_i - meta['first_commit'] / 1000 }.to_json, {:content_type => :json, :cookie => cookie[0]}
-    end
   end
 
   # rspec-mocks config goes here. You can use an alternate test double
