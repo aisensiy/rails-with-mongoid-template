@@ -1,2 +1,0 @@
-class ProductionController < ApplicationController
-end
