@@ -21,7 +21,7 @@ require 'json'
 require 'rest_client'
 
 Airborne.configure do |config|
-  config.base_url = ENV['ENDPOINT'] || ''
+  config.base_url = ENV['ENTRYPOINT'] || ''
 end
 
 RSpec.configure do |config|
@@ -52,11 +52,11 @@ RSpec.configure do |config|
     if File.file?('../manifest.json')
       print 'login...'
       meta = JSON.parse(File.read('../manifest.json'))
-      response = RestClient.post "#{meta['entry_point']}/authentication", { user_name: 'admin' }, {:content_type => :json}
+      response = RestClient.post "#{meta['entry_point']}/authentication", { user_name: 'admin' }.to_json, {:content_type => :json}
       cookie = response.headers[:set_cookie]
 
       print 'post result...'
-      RestClient.put meta['evaluation_uri'], { status: "FAILED", time: Time.now.to_i - meta['first_commit'] / 1000 }, {:content_type => :json, :cookie => cookie}
+      RestClient.put meta['evaluation_uri'], { status: "FAILED", time: Time.now.to_i - meta['first_commit'] / 1000 }.to_json, {:content_type => :json, :cookie => cookie[0]}
     end
   end
 
