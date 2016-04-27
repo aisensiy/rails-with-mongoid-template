@@ -8,6 +8,11 @@ class CustomFormatter < RSpec::Core::Formatters::BaseFormatter
   RSpec::Core::Formatters.register self, :dump_summary
 
   def dump_summary(notification)
+    if notification.failure_count == 0
+      print 'verify passed!'
+    else
+      print 'verify failed!'
+    end
     notify(notification.failure_count == 0)
   end
 
