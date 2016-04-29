@@ -26,7 +26,7 @@ class CustomFormatter < RSpec::Core::Formatters::BaseFormatter
     if File.file?('../manifest.json')
       print 'login...'
       meta = JSON.parse(File.read('../manifest.json'))
-      response = RestClient.post("#{meta['entry_point']}/authentication", { user_name: 'admin' }.to_json, {:content_type => :json})
+      response = RestClient.post("#{meta['entry_point']}/authentication", { user_name: 'admin', user_password: '123' }.to_json, {:content_type => :json})
       cookie = response.headers[:set_cookie]
 
       print 'post result...'
